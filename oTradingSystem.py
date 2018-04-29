@@ -37,8 +37,8 @@ import oTradingOperations as to
 
 
 # First specify account ID and number
-Account_ID = '101-001-7956909-001'
-Account_Token = 'b85a3c11b13b6b6a8f5b78853d82b6c4-eb7a0f6905861a51be496779e2966729'
+Account_ID = '...'
+Account_Token = '...'
 
 
 # Specify the burn-in as well as the dates for all Fridays. The program will
@@ -53,10 +53,11 @@ fridays = [(..,..),(..,..),...] # Put the Fridays in a (day,month) tuple
 
 print '\n Initializing the Kalman filter. \n'
 
-x_0 = np.array([[1],[1],[1],[1],[1].....])
+# These need to be specified properly for real use
+x_0 = np.array([[1],[1],[1],[1],[1]])
 P_0 = np.ones((5,5))
 A = np.eye(5)
-Q = np.eye(5) # This value was determined by backtesting
+Q = np.eye(5) 
 R = 1
 kf = KalmanCoint(x_0, P_0, A, Q, R) # Initialize Kalman filter
 
