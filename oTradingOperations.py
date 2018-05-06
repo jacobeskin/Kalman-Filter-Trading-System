@@ -1,7 +1,7 @@
 
 """
-Class for interacting with the Oanda API and performing
-the trading and position management..
+Library of all the methods for interacting with Oanda API, probably will end 
+up being a two classes, maybe some auxiliary methods...will see...
 """
 import time
 import numpy as np
@@ -12,6 +12,8 @@ import oandapyV20.endpoints.orders as orders
 import oandapyV20.endpoints.trades as trades
 import oandapyV20.endpoints.accounts as accounts
 from oandapyV20.contrib.requests import MarketOrderRequest
+
+import requests # Also for error handling
 
 class oPositionManager:
 
@@ -67,7 +69,12 @@ class oPositionManager:
             except oandapyV20.exceptions.V20Error as err:
                 print 'Price request failed for',  self.instruments[i]
                 error +=1
-                print 'Error number', error
+                print 'Error reason V20 API\n', error
+            # Other connection errors
+            except requests.exceptions.RequestExceptions as err:
+                print 'Price request failed for',  self.instruments[i]
+                error +=1
+                print 'Error reason\n', err
 
             # In case there is a problem getting the prices
             if (error>5) and (waits<=50):
@@ -98,10 +105,10 @@ class oPositionManager:
             print '\n Opening on', self.instruments[i]
             try:
                 trd = self.client.request(request)
-                print 'Success!\n'
                 opening_positions.append(trd['orderFillTransaction']['id'])
+		print 'Success!\n'
                 
-            except oandapyV20.exceptions.V20Error as err:
+            except (oandapyV20.exceptions.V20Error) as err:
                 print 'Error in opening position! Cancelling trade!'
                 OK = False
                 if len(opening_positions)>0:
@@ -121,12 +128,13 @@ class oPositionManager:
         if OK:
             for i in opening_positions:
                self.existing_positions.append(i)
+            print 'Position IDs:', self.existing_positions, '\n' 
                
         return OK
                         
         
     # Method for opening and closing positions
-    def oManage(self, x_pri, H, Z, Z_mean, Z_std):
+    def oManage(self, x_pri, z, H, Z, Z_mean, Z_std):
 
         opening_positions = [] # Positions opened in the middle of a trade
 
@@ -139,7 +147,8 @@ class oPositionManager:
 
                 # Cycle through the ticket numbers and close the positions
                 i = 0
-                while i<len(self.existing_positions):
+                num_positions = len(self.existing_positions)
+                while i<num_positions:
 
                     request = trades.TradeClose(accountID=self.ID,
                                             tradeID=self.existing_positions[i])
@@ -173,7 +182,7 @@ class oPositionManager:
             for i in xrange(len(self.instruments)):
                 if i==0:
                     if self.I_types[i]==1:
-                        lots[i] = int(np.around(balance/Z,0))
+                        lots[i] = int(np.around(balance/z,0))
                     else: lots[i] = int(np.around(balance,0))
                 else:
                     if self.I_types[i]==1:
@@ -216,10 +225,11 @@ class oPositionManager:
         if (Z>=Z_mean+2.0*Z_std) and (self.long_short!='long'):
 
             # Calculate first the lot sizes
+	    lots = [0]*len(self.instruments)
             for i in xrange(len(self.instruments)):
                 if i==0:
                     if self.I_types[i]==1:
-                        lots[i] = int(np.around(balance/Z,0))
+                        lots[i] = int(np.around(balance/z,0))
                     else: lots[i] = int(np.around(balance,0))
                     lots[i] = -1*lots[i]
                 else:
