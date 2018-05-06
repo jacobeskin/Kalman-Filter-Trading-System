@@ -12,7 +12,9 @@ Code works (or should work as is) a list of tuples denoting Fridays is added man
 Since the program skips Friday 5pm EST - Sunday 5pm EST by just waiting a fixed amount of time, the 
 oTradingSystem.py should be run only when trading is active.
 
-So to be fixed next are insertion of data from the command line and ability to start the system whenever. Also adding a possibility for pickling the system so that data is not lost if the system is shut down for maintenance for example is on the agenda. All is dependent on time...
+So to be fixed next are insertion of data from the command line and ability to start the system whenever. All is dependent on time...
+
+Added possibility to pickle the states if one wants to do maintenance and updates during the weekend for example. Also added some safeguards to handle errors if connection to the broker is cut, something that seems to happen every Thursday at 10pm EST...
 
 Broker used is Oanda, and the API for it is provided by https://github.com/hootnot/oanda-api-v20, it is exellent and easy to use! Thanks hootnot!
 
