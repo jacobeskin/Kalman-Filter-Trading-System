@@ -158,7 +158,7 @@ class oPositionManager:
                     try:
                         _ = self.client.request(request)
                         print 'Closed', self.existing_positions[i]
-                        closing_positions.apend(self.existing_positions[i])
+                        closing_positions.append(self.existing_positions[i])
                         i += 1
                     except oandapyV20.exceptions.V20Error as err:
                         print 'Close failed for', self.existing_positions[i]
