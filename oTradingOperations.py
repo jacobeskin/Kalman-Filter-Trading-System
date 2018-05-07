@@ -137,6 +137,7 @@ class oPositionManager:
     def oManage(self, x_pri, z, H, Z, Z_mean, Z_std):
 
         opening_positions = [] # Positions opened in the middle of a trade
+	closing_positions = [] # Positions to be closed
 
         # Always first check if there are positions to be closed
         if len(self.existing_positions)>0:
@@ -157,8 +158,7 @@ class oPositionManager:
                     try:
                         _ = self.client.request(request)
                         print 'Closed', self.existing_positions[i]
-                        self.existing_positions.remove(
-                            self.existing_positions[i])
+                        closing_positions.apend(self.existing_positions[i])
                         i += 1
                     except oandapyV20.exceptions.V20Error as err:
                         print 'Close failed for', self.existing_positions[i]
@@ -166,6 +166,8 @@ class oPositionManager:
 
                 self.long_short = ''
                 self.std_away = []
+		for k in closing_positions:
+			self.existing_positions.remove(k)
 
         # Otherwise look for possibly opening trades
                         
